@@ -41,12 +41,33 @@ namespace XOProject.Controller
 
         [HttpGet("Analysis/{symbol}")]
         public async Task<IActionResult> GetAnalysis([FromRoute]string symbol)
-        {
+        {            
             var result = new List<TradeAnalysis>();
-            
+
+            var stats = _tradeRepository.Query()
+                .Where(x => x.Symbol == symbol)
+                .GroupBy(x => x.Action)
+                .Select(x => new
+                {                    
+                    sumTrades = x.Sum(z => z.NoOfShares),
+                    avgTrades = x.Average(z => z.NoOfShares),
+                    maxValue = x.Max(z => z.NoOfShares),
+                    minValue = x.Min(z => z.NoOfShares),
+                    actionValue = x.Key
+                }).ToList();
+
+            foreach (var item in stats)
+            {
+                TradeAnalysis ta = new TradeAnalysis();
+                ta.Sum = item.sumTrades;
+                ta.Average = item.avgTrades;
+                ta.Maximum = item.maxValue;
+                ta.Minimum = item.minValue;
+                ta.Action = item.actionValue;
+                result.Add(ta);
+            }
+
             return Ok(result);
         }
-
-
     }
 }

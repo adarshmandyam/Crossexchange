@@ -15,10 +15,9 @@ namespace XOProject.Controller
         }
 
         [HttpGet("{portFolioid}")]
-        public async Task<IActionResult> GetPortfolioInfo([FromRoute]int portFolioid)
+        public IActionResult GetPortfolioInfo([FromRoute]int portFolioid)
         {
             var portfolio = _portfolioRepository.GetAll().Where(x => x.Id.Equals(portFolioid));
-            
             return Ok(portfolio);
         }
 
@@ -32,7 +31,6 @@ namespace XOProject.Controller
             }
 
             await _portfolioRepository.InsertAsync(value);
-
             return Created($"Portfolio/{value.Id}", value);
         }
 
